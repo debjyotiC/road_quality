@@ -1,44 +1,38 @@
 import json
+import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
-d = json.load(open("data/road-quality-2.json"))
+path = "data/road-quality-2.json"
+d = json.load(open(path))
 
-x_acc = d['rot_acc_x']
-y_acc = d['rot_acc_y']
-z_acc = d['rot_acc_z']
+x_acc = np.array(d['rot_acc_x'])
+y_acc = np.array(d['rot_acc_y'])
+z_acc = np.array(d['rot_acc_z'])
 anomaly_time_stamps = [(data['start'], data['end']) for data in d['anomalies']]
 
-# Create a figure and three subplots in a 3x1 grid
-fig, axes = plt.subplots(3, 1, figsize=(10, 8))
-
-# Plot data in each subplot
-axes[0].plot(x_acc, label='x-axis', color='blue')
-axes[1].plot(y_acc, label='y-axis', color='green')
-axes[2].plot(z_acc, label='z-axis', color='red')
-
-# Enable grid in each subplot
-axes[0].grid(True)
-axes[1].grid(True)
-axes[2].grid(True)
+acc_vec = np.sqrt(x_acc ** 2 + y_acc ** 2 + z_acc ** 2)
 
 
-# Customize each subplot (optional)
-axes[0].set_ylabel('Acc. m/s^2')
-axes[1].set_ylabel('Acc. m/s^2')
-axes[2].set_ylabel('Acc. m/s^2')
-axes[2].set_xlabel('Time')
+def mark_time_ranges(pl, time_ranges):
+    for time_range in time_ranges:
+        pl.fill_betweenx(y=[acc_vec.min(), acc_vec.max()], x1=time_range[0], x2=time_range[1], color='red', alpha=0.6)
 
-axes[0].set_title('Acc. x-axis')
-axes[1].set_title('Acc. y-axis')
-axes[2].set_title('Acc. z-axis')
 
-# Add a legend to each subplot
-axes[0].legend()
-axes[1].legend()
-axes[2].legend()
+# Create a figure and a subplot
+fig, ax = plt.subplots()
+
+plt.plot(acc_vec, label='Acc. vector', color='green')
+mark_time_ranges(ax, anomaly_time_stamps)
+plt.title('Acceleration vector')
+plt.xlabel('Time')
+plt.ylabel('Amp. m/s^2')
+
+# Add a legend for the highlighted area
+highlighted_area_patch = mpatches.Patch(facecolor='red', alpha=0.6, label='Anomalies')
+plt.legend(handles=[highlighted_area_patch])
 
 # Adjust layout and padding
 plt.tight_layout()
-
-# Display the plot
+plt.grid(True)
 plt.show()
