@@ -30,23 +30,31 @@
             // Google Maps style red pin icon
             const customPinUrl = "https://upload.wikimedia.org/wikipedia/commons/e/ed/Map_pin_icon.svg"; // URL for a Google-style red pin
 
+            function formatDateTime(dateString) {
+                const dateObj = new Date(dateString);
+                const datePart = dateObj.toLocaleDateString('en-GB'); // 'en-GB' format is dd/mm/yyyy
+                const timePart = dateObj.toLocaleTimeString('en-GB'); // 'en-GB' format is HH:MM:SS
+                return `${datePart} ${timePart}`;
+            }
+
             function initializeMap(latitude, longitude, velocity, date) {
+                const formattedDate = formatDateTime(date);
                 const data = [{
                     type: 'scattermapbox',
                     lat: [latitude],
                     lon: [longitude],
                     mode: 'markers+text',
                     marker: {
-                        size: 40,  // Adjust size as per your requirement
-                        symbol: 'marker',  // Use the default marker
+                        size: 40,
+                        symbol: 'marker',
                         color: 'red',
                         opacity: 0.8,
                         icon: {
-                            url: customPinUrl, // URL to the custom pin image
+                            url: customPinUrl,
                             size: 40
                         }
                     },
-                    text: [`Velocity: ${velocity.toFixed(4)} m/s <br> Updated at: ${date}`], // Display velocity and date
+                    text: [`Velocity: ${velocity.toFixed(4)} m/s <br> Updated at: ${formattedDate}`],
                     textposition: 'top center',
                     textfont: {
                         size: 16,
@@ -63,18 +71,19 @@
                         center: {lat: latitude, lon: longitude},
                         zoom: 11.5,
                     },
-                    margin: { t: 0, r: 0, b: 0, l: 0 }  // Remove margins to make it full screen
+                    margin: { t: 0, r: 0, b: 0, l: 0 }
                 };
 
                 Plotly.newPlot('map', data, layout);
             }
 
             function updateMap(latitude, longitude, velocity, date) {
+                const formattedDate = formatDateTime(date);
                 const update = {
                     lat: [[latitude]],
                     lon: [[longitude]],
-                    text: [`Velocity: ${velocity.toFixed(4)} m/s <br> Updated at: ${date}`], // Update velocity and date
-                    marker: { color: 'red' },  // Keep marker red
+                    text: [`Velocity: ${velocity.toFixed(4)} m/s <br> Updated at: ${formattedDate}`],
+                    marker: { color: 'red' },
                 };
                 Plotly.restyle('map', update);
             }

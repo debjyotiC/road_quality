@@ -1,5 +1,3 @@
-import plotly.express as px
-import pandas as pd
 import requests
 from flask import Flask, render_template, jsonify
 
